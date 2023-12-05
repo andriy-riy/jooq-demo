@@ -1,0 +1,15 @@
+version: "3.9"
+services:
+  postgres:
+    image: postgres:16.1
+    environment:
+      POSTGRES_DB: jooq-demo
+      POSTGRES_USER: admin
+      POSTGRES_PASSWORD: admin
+    volumes:
+      - databases:/var/lib/postgres
+    ports:
+      - "5432:5432"
+
+volumes:
+  databases:
