@@ -1,4 +1,4 @@
-create table countries
+create table country
 (
     id              bigserial primary key,
     name            varchar(255),
@@ -6,10 +6,10 @@ create table countries
     population      int
 );
 
-create table cities
+create table city
 (
     id         bigserial primary key,
-    country_id bigint,
+    country_id bigint references country(id),
     name       varchar(255),
     population int
 );

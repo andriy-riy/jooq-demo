@@ -84,7 +84,7 @@ class JooqDemoTests {
 //    List<CountryDTO> countriesDto = List.of(
 //            new CountryDTO("Ukraine", "UNITARY", 45_000_000),
 //            new CountryDTO("Poland", "UNITARY", 35_000_000),
-//            new CountryDTO("Ukraine", "UNITARY", 45_000_000)
+//            new CountryDTO("France", "UNITARY", 68_000_000)
 //    );
 //
 //    List<CountryRecord> records = countriesDto.stream()
@@ -108,10 +108,6 @@ class JooqDemoTests {
     System.out.println(countries);
 
 
-    /*
-    select name, government_form from country
-    where population > 30000000 and government_form != 'FEDERATION';
-     */
 //    Result<Record2<String, String>> records = dsl.select(COUNTRY.NAME, COUNTRY.GOVERNMENT_FORM)
 //            .from(COUNTRY)
 //            .where(COUNTRY.POPULATION.greaterThan(30_000_000))
@@ -120,12 +116,13 @@ class JooqDemoTests {
 //
 //    System.out.println(records);
 
+
 //    Result<Record> countryWithCities = dsl.select()
 //            .from(COUNTRY.join(CITY)
 //                    .on(CITY.COUNTRY_ID.eq(COUNTRY.ID)))
 //            .where(COUNTRY.POPULATION.greaterThan(30_000_000))
 //            .and(COUNTRY.GOVERNMENT_FORM.notEqual("FEDERATION"))
-//            .and(CITY.NAME.like("%Ivan%"))
+//            .and(CITY.NAME.like("%Lv%"))
 //            .fetch();
 //
 //    System.out.println(countryWithCities);
@@ -133,37 +130,29 @@ class JooqDemoTests {
 
   @Test
   void aggregation() {
-    Result<Record2<String, Integer>> result = dsl.select(COUNTRY.GOVERNMENT_FORM, count())
-            .from(COUNTRY)
-            .groupBy(COUNTRY.GOVERNMENT_FORM)
-            .orderBy(COUNTRY.GOVERNMENT_FORM)
+    Result<Record2<Object, Integer>> result = dsl.select(field("range"), count())
+            .from(dsl.select(choose()
+                            .when(COUNTRY.POPULATION.between(0, 1_000_000), val("0 - 1 000 000"))
+                            .when(COUNTRY.POPULATION.between(1_000_000, 10_000_000), val("1 000 000 - 10 000 000"))
+                            .when(COUNTRY.POPULATION.between(10_000_000, 50_000_000), val("10 000 000 - 50 000 000"))
+                            .when(COUNTRY.POPULATION.between(50_000_000, 200_000_000), val("50 000 000 - 200 000 000"))
+                            .else_(val("> 200 000 000"))
+                            .as("range"))
+                    .from(COUNTRY)
+            )
+            .groupBy(field("range"))
             .fetch();
 
     System.out.println(result);
-
-//    Result<Record2<Object, Integer>> result = dsl.select(field("range"), count())
-//            .from(dsl.select(choose()
-//                            .when(COUNTRY.POPULATION.between(0, 1_000_000), val("0 - 1 000 000"))
-//                            .when(COUNTRY.POPULATION.between(1_000_000, 10_000_000), val("1 000 000 - 10 000 000"))
-//                            .when(COUNTRY.POPULATION.between(10_000_000, 50_000_000), val("10 000 000 - 50 000 000"))
-//                            .when(COUNTRY.POPULATION.between(50_000_000, 200_000_000), val("50 000 000 - 200 000 000"))
-//                            .else_(val("> 200 000 000"))
-//                            .as("range"))
-//                    .from(COUNTRY)
-//            )
-//            .groupBy(field("range"))
-//            .fetch();
-//
-//    System.out.println(result);
   }
 
   @Test
   void update() {
-//    dsl.update(COUNTRY)
-//            .set(COUNTRY.GOVERNMENT_FORM, "FEDERATION")
-//            .set(COUNTRY.POPULATION, 40_000_000)
-//            .where(COUNTRY.ID.eq(1L))
-//            .execute();
+    dsl.update(COUNTRY)
+            .set(COUNTRY.GOVERNMENT_FORM, "FEDERATION")
+            .set(COUNTRY.POPULATION, 40_000_000)
+            .where(COUNTRY.ID.eq(1L))
+            .execute();
 
 
 //    var country = new CountryDTO("Ukraine", "FEDERATION", 40_000_000);
@@ -183,28 +172,21 @@ class JooqDemoTests {
 
   @Test
   void upsert() {
-    var country = new CountryDTO("Ukraine", "UNITARY", 45_000_000);
+    var country = new CountryRecord(1L, "Ukraine", "UNITARY", 45_000_000);
 
     dsl.insertInto(COUNTRY)
-            .set(dsl.newRecord(COUNTRY, country))
+            .set(country)
             .onDuplicateKeyUpdate()
-            .set(COUNTRY.GOVERNMENT_FORM, country.governmentForm())
-            .set(COUNTRY.POPULATION, country.population())
+            .set(COUNTRY.GOVERNMENT_FORM, country.getGovernmentForm())
+            .set(COUNTRY.POPULATION, country.getPopulation())
             .execute();
 
 //    dsl.insertInto(COUNTRY)
-//            .set(dsl.newRecord(COUNTRY, country))
-//            .onDuplicateKeyUpdate()
-//            .set(dsl.newRecord(COUNTRY, country))
-//            .execute();
-
-//    var country = new CountryDTO("Ukraine", "UNITARY", 45_000_000);
-//
-//    dsl.insertInto(COUNTRY)
-//            .set(dsl.newRecord(COUNTRY, country))
+//            .set(country)
 //            .onConflict()
 //            .doUpdate()
-//            .set(COUNTRY.POPULATION, excluded(COUNTRY.POPULATION))
+//            .set(COUNTRY.GOVERNMENT_FORM, country.getGovernmentForm())
+//            .set(COUNTRY.POPULATION, country.getPopulation())
 //            .execute();
   }
 
