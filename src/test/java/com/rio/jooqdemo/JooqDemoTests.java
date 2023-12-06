@@ -65,33 +65,33 @@ class JooqDemoTests {
 //    dsl.insertInto(COUNTRY)
 //            .set(dsl.newRecord(COUNTRY, country))
 //            .execute();
-  }
 
-  @Test
-  void batchInsert() {
     /*
       insert into country(name, government_form, population)
       values ('Ukraine', 'UNITARY', 45000000)
              ('Poland', 'UNITARY', 35000000)
              ('France', 'UNITARY', 68000000);
      */
-    dsl.insertInto(COUNTRY, COUNTRY.NAME, COUNTRY.GOVERNMENT_FORM, COUNTRY.POPULATION)
-            .values("Ukraine", "UNITARY", 45_000_000)
-            .values("Poland", "UNITARY", 35_000_000)
-            .values("France", "UNITARY", 68_000_000)
-            .execute();
+//    dsl.insertInto(COUNTRY, COUNTRY.NAME, COUNTRY.GOVERNMENT_FORM, COUNTRY.POPULATION)
+//            .values("Ukraine", "UNITARY", 45_000_000)
+//            .values("Poland", "UNITARY", 35_000_000)
+//            .values("France", "UNITARY", 68_000_000)
+//            .execute();
+  }
 
-//    List<CountryDTO> countriesDto = List.of(
-//            new CountryDTO("Ukraine", "UNITARY", 45_000_000),
-//            new CountryDTO("Poland", "UNITARY", 35_000_000),
-//            new CountryDTO("France", "UNITARY", 68_000_000)
-//    );
-//
-//    List<CountryRecord> records = countriesDto.stream()
-//            .map(countryDTO -> dsl.newRecord(COUNTRY, countryDTO))
-//            .toList();
-//
-//    dsl.batchInsert(records).execute();
+  @Test
+  void batchInsert() {
+    List<CountryDTO> countriesDto = List.of(
+            new CountryDTO("Ukraine", "UNITARY", 45_000_000),
+            new CountryDTO("Poland", "UNITARY", 35_000_000),
+            new CountryDTO("France", "UNITARY", 68_000_000)
+    );
+
+    List<CountryRecord> records = countriesDto.stream()
+            .map(countryDTO -> dsl.newRecord(COUNTRY, countryDTO))
+            .toList();
+
+    dsl.batchInsert(records).execute();
   }
 
   @Test
