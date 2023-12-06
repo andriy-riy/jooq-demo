@@ -66,12 +66,7 @@ class JooqDemoTests {
 //            .set(dsl.newRecord(COUNTRY, country))
 //            .execute();
 
-    /*
-      insert into country(name, government_form, population)
-      values ('Ukraine', 'UNITARY', 45000000)
-             ('Poland', 'UNITARY', 35000000)
-             ('France', 'UNITARY', 68000000);
-     */
+
 //    dsl.insertInto(COUNTRY, COUNTRY.NAME, COUNTRY.GOVERNMENT_FORM, COUNTRY.POPULATION)
 //            .values("Ukraine", "UNITARY", 45_000_000)
 //            .values("Poland", "UNITARY", 35_000_000)
@@ -103,7 +98,7 @@ class JooqDemoTests {
     List<CountryRecord> countries = dsl.selectFrom(COUNTRY)
             .where(COUNTRY.POPULATION.greaterThan(30_000_000))
             .and(COUNTRY.GOVERNMENT_FORM.notEqual("FEDERATION"))
-            .fetchInto(CountryRecord.class);
+            .fetchInto(COUNTRY);
 
     System.out.println(countries);
 
@@ -184,9 +179,7 @@ class JooqDemoTests {
 //    dsl.insertInto(COUNTRY)
 //            .set(country)
 //            .onConflict()
-//            .doUpdate()
-//            .set(COUNTRY.GOVERNMENT_FORM, country.getGovernmentForm())
-//            .set(COUNTRY.POPULATION, country.getPopulation())
+//            .doNothing()
 //            .execute();
   }
 
